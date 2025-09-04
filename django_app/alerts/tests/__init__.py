@@ -1,0 +1,1 @@
+from .alert_model_test import AlertModelTest

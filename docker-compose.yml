@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+  
+  app:
+    container_name: django
+    build: 
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./django_app:/django_app
+    env_file:
+      - ./.env
+    environment:
+      - RUN_MODE=django
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    container_name: psql
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+    environment:
+      - TZ=America/Sao_Paulo
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

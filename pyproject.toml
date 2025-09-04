@@ -1,0 +1,14 @@
+[project]
+name = "tremor-detector"
+version = "1.0.0"
+description = "A Django project for tremor detection and analysis."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django==5.2",
+    "psycopg2-binary==2.9.10",
+    "uvicorn[standard]",
+    "djangorestframework==3.16.0",
+    "Faker==37.3.0",
+    "python-telegram-bot==22.3",
+]
