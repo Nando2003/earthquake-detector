@@ -61,6 +61,24 @@ $ docker compose app exec uv run manage.py runbot
 ```
 > Don't forget to set `TELEGRAM_BOT_TOKEN` in `.env`
 
+## Alert's endpoint
+
+To send alerts to subscribers, use the following endpoint:
+```
+POST /alerts/webhook/
+```
+
+The payload should be in JSON format and include the following fields:
+- `level`: An string representing the alert level ("High" or "Low").
+- `detected_at`: A timestamp in ISO 8601 format indicating when the alert was detected.
+
+Example payload:
+```json
+{
+    "level": "High",
+    "detected_at": "2023-10-01T12:34:56"
+}
+```
 
 ## Entity Diagram
 
