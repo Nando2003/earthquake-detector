@@ -1,16 +1,17 @@
-from asgiref.sync import async_to_sync
+from datetime import timedelta
+from django.utils import timezone
 
-from rest_framework.views import APIView
+from asgiref.sync import async_to_sync
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import status
-
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
+from rest_framework.views import APIView
+from subscribers.models import Subscriber
+from telegram_bot.handlers import bot
 
 from alerts.models import Alert
-from telegram_bot.handlers import bot
-from subscribers.models import Subscriber
 from alerts.serializers import AlertWebhookSerializer
 
 
@@ -28,10 +29,14 @@ class AlertWebhookView(APIView):
                 if isinstance(validated_data, dict):
                     level = validated_data['level']
                     detected_at = validated_data['detected_at']
+                    cutoff = timezone.now() - timedelta(minutes=3)
+
+                    if detected_at < cutoff:
+                        return Response({'error': 'Alert is too old'}, status=status.HTTP_400_BAD_REQUEST)
 
                     alert = Alert.objects.create(
                         level_of_severity=level,
-                        detected_at=detected_at  # detected_at is already a datetime object
+                        detected_at=detected_at
                     )
 
                     subscribers = Subscriber.objects.filter(show_alerts=True).all()
@@ -58,7 +63,6 @@ class AlertWebhookView(APIView):
 
                     }
 
-                    
                     for subscriber in subscribers:
                         message = message_contact_type_mapper[subscriber.contact_type][alert.level_of_severity]
 
